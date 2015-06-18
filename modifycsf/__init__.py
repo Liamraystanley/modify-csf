@@ -4,11 +4,10 @@ import sys
 import re
 import os
 import itertools
-import psutil
 import subprocess
 from shutil import copyfile
 
-version = "0.0.2"
+version = "0.0.4"
 csf_binary_location = "/usr/sbin/csf"
 
 parser = argparse.ArgumentParser(

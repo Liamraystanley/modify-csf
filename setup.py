@@ -15,5 +15,4 @@ setup(name="mcsf",
       license="MIT",
       packages=["modifycsf"],
       scripts=['mcsf'],
-      requires=['psutil'],
       **extra)
