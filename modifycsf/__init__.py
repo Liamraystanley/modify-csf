@@ -4,6 +4,8 @@ import sys
 import re
 import os
 import itertools
+import psutil
+import subprocess
 from shutil import copyfile
 
 version = "0.0.1"
@@ -70,6 +72,34 @@ class mcsf(object):
             self.out(
                 "Unable to make a backup of the configuration file "
                 "({}). Ignoring. ({})".format(self.vargs.configfile, str(e)), "extra")
+
+    def update_config(self, value, keys):
+        try:
+            self.out("Attempting to write changes to {}...".format(
+                     self.vargs.configfile), "extra")
+            with open(self.vargs.configfile, "r") as f:
+                tmp = f.read().split("\n")
+                lines = []
+                for line in tmp:
+                    if line.startswith("#"):
+                        lines.append(line)
+                        continue
+                    replaced = False
+                    for key in keys:
+                        if line.startswith(key + " "):
+                            new = re.sub(r'^%s = ".*?"$' % key, '{} = "{}"'.format(key, value), line)
+                            lines.append(new)
+                            replaced = True
+                            break
+                    if not replaced:
+                        lines.append(line)
+            with open(self.vargs.configfile, "w") as f:
+                f.write("\n".join(lines))
+            self.out("Successfully saved configuration file.", "extra")
+        except Exception as e:
+            self.out("Unable to write changes to {} ({}). Exiting.".format(
+                self.vargs.configfile, str(e)), "error")
+            sys.exit(1)
 
     def column(self, data, headers=None):
         if headers and not self.vargs.noheader:
@@ -219,7 +249,8 @@ class mcsf(object):
                 ports = self.unique_ports(set([int(self.vargs.allow)] + port_range))
             self.backup_config()
             self.update_config(ports, keys=config_range)
-            self.out("Added port(s) {}. Please restart CSF with 'csf -r'.".format(self.vargs.allow))
+            self.out("Added port(s) {}.".format(self.vargs.allow))
+            self.restart_csf()
 
         # --remove
         elif self.vargs.remove:
@@ -233,33 +264,14 @@ class mcsf(object):
                 ports = self.unique_ports([x for x in set(port_range) if x not in ports])
             self.backup_config()
             self.update_config(ports, keys=config_range)
-            self.out("Removed port(s) {}. Please restart CSF with 'csf -r'.".format(self.vargs.remove))
+            self.out("Removed port(s) {}.".format(self.vargs.remove))
+            self.restart_csf()
 
         else:
             self.out(
                 "Not enough arguments supplied. Please use 'mcsf --help' "
                 "on how to use mcsf.", "error")
             sys.exit(1)
-
-    def update_config(self, value, keys):
-        with open(self.vargs.configfile, "r") as f:
-            tmp = f.read().split("\n")
-            lines = []
-            for line in tmp:
-                if line.startswith("#"):
-                    lines.append(line)
-                    continue
-                replaced = False
-                for key in keys:
-                    if line.startswith(key + " "):
-                        new = re.sub(r'^%s = ".*?"$' % key, '{} = "{}"'.format(key, value), line)
-                        lines.append(new)
-                        replaced = True
-                        break
-                if not replaced:
-                    lines.append(line)
-        with open(self.vargs.configfile, "w") as f:
-            f.write("\n".join(lines))
 
     def unique_ports(self, port_list, conf=False, ranges=True):
         if conf:
@@ -292,12 +304,24 @@ class mcsf(object):
             b = list(b)
             yield b[0][1], b[-1][1]
 
+    def restart_csf(self):
+        self.out("Checking if LFD/CSF is running...", "extra")
+        p = subprocess.Popen([csf_binary_location, '-r'], stdout=subprocess.PIPE)
+        out = p.communicate()
+        if "LOGDROPIN" in out[0]:
+            # Assume it's running
+            self.out("Found LFD process. CSF restarted", "extra")
+            self.out("Successfully restarted CSF.")
+        else:
+            self.out("Error while attempting to restart CSF...", "extra")
+            self.out("Please start CSF with 'csf -e'.")
+
     def run(self):
-        #try:
-        self.run_checks()
-        #except Exception as e:
-        #    self.out("Error while attempting to process: " + str(e), "error")
-        #    sys.exit(1)
+        try:
+            self.run_checks()
+        except Exception as e:
+            self.out("Error while attempting to process: " + str(e), "error")
+            sys.exit(1)
 
 if __name__ == "__main__":
     main = mcsf().run()
