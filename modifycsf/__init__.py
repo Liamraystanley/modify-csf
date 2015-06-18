@@ -42,6 +42,7 @@ parser.add_argument("--nobackup", action="store_true",
                     help="don't make a backup of the configuration file when making modifications")
 parser.add_argument("-c", "--configfile", default="/etc/csf/csf.conf",
                     help="location to CSF configuration file")
+parser.add_argument("--no-restart", action="store_true", help="location to CSF configuration file")
 parser.add_argument("--ignore-check", action="store_true",
                     help="don't check to see if CSF is installed in " + csf_binary_location)
 parser.add_argument("-V", "--version", action="store_true", help="version information")
@@ -305,6 +306,9 @@ class mcsf(object):
             yield b[0][1], b[-1][1]
 
     def restart_csf(self):
+        if self.vargs.no_restart:
+            self.out("Not restarting CSF, --no-restart specified.", "extra")
+            return
         self.out("Checking if LFD/CSF is running...", "extra")
         p = subprocess.Popen([csf_binary_location, '-r'], stdout=subprocess.PIPE)
         out = p.communicate()
