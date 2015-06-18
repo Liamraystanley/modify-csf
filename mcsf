@@ -1,0 +1,4 @@
+#!/usr/bin/python
+
+from modifycsf import mcsf
+mcsf().run()
