@@ -8,7 +8,7 @@ import psutil
 import subprocess
 from shutil import copyfile
 
-version = "0.0.1"
+version = "0.0.2"
 csf_binary_location = "/usr/sbin/csf"
 
 parser = argparse.ArgumentParser(
