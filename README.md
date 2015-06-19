@@ -3,7 +3,7 @@
 
 ## Installation
 
-**gcc is** required and so are the the **python headers**. They can easily be installed by using the distro package manager.
+**gcc** _is required_ and so are **python headers**. They can easily be installed by using your distro package manager in most cases.
 
 ### Debian/Ubuntu based
 
