@@ -7,7 +7,7 @@ import itertools
 import subprocess
 from shutil import copyfile
 
-version = "0.0.4"
+version = "0.0.5"
 csf_binary_location = "/usr/sbin/csf"
 
 parser = argparse.ArgumentParser(
@@ -120,16 +120,16 @@ class mcsf(object):
             if self.vargs.verbose:
                 print(msg, file=sys.stdout)
         elif severity == "warning":
-            print("[warning] {}".format(msg), file=sys.stderr)
+            print("[warning] {0}".format(msg), file=sys.stderr)
         elif severity == "error":
-            print("[error] {}" .format(msg), file=sys.stderr)
+            print("[error] {0}" .format(msg), file=sys.stderr)
         else:
-            print("[{}] {}".format(severity, msg), file=sys.stdout)
+            print("[{0}] {1}".format(severity, msg), file=sys.stdout)
         return
 
     def run_checks(self):
         if self.vargs.version:
-            self.out("Running mcsf version {}".format(version))
+            self.out("Running mcsf version {0}".format(version))
             sys.exit(0)
 
         # Check os. CSF should only be run on linux...
@@ -139,13 +139,13 @@ class mcsf(object):
 
         # See if CSF is even installed..
         if not self.vargs.ignore_check and not os.path.isfile(csf_binary_location):
-            self.out("It doesn't look like CSF is installed in {}. Exiting.".format(
+            self.out("It doesn't look like CSF is installed in {0}. Exiting.".format(
                 csf_binary_location), "error")
             sys.exit(1)
 
         # See if the config file exists/have perms
         if not os.path.isfile(self.vargs.configfile):
-            self.out("The configuration file for CSF doesn't exist ({}) or can't read from it (are you running as root?). Exiting.".format(
+            self.out("The configuration file for CSF doesn't exist ({0}) or can't read from it (are you running as root?). Exiting.".format(
                 self.vargs.configfile), "error")
             sys.exit(1)
 
@@ -181,7 +181,7 @@ class mcsf(object):
         try:
             self.config = self.readconfig()
         except Exception as e:
-            self.out("Error while parsing {}: {}".format(self.vargs.configfile, str(e)), "error")
+            self.out("Error while parsing {0}: {1}".format(self.vargs.configfile, str(e)), "error")
             sys.exit(1)
 
         # Some pre-configuration of what matches, and what doesn't
@@ -249,7 +249,7 @@ class mcsf(object):
                 ports = self.unique_ports(set([int(self.vargs.allow)] + port_range))
             self.backup_config()
             self.update_config(ports, keys=config_range)
-            self.out("Added port(s) {}.".format(self.vargs.allow))
+            self.out("Added port(s) {0}.".format(self.vargs.allow))
             self.restart_csf()
 
         # --remove
@@ -264,7 +264,7 @@ class mcsf(object):
                 ports = self.unique_ports([x for x in set(port_range) if x not in ports])
             self.backup_config()
             self.update_config(ports, keys=config_range)
-            self.out("Removed port(s) {}.".format(self.vargs.remove))
+            self.out("Removed port(s) {0}.".format(self.vargs.remove))
             self.restart_csf()
 
         else:
