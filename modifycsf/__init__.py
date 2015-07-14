@@ -53,7 +53,7 @@ class mcsf(object):
         self.config = {}
 
     def readconfig(self):
-        self.out("Attempting to parse {}...".format(self.vargs.configfile), "extra")
+        self.out("Attempting to parse {0}...".format(self.vargs.configfile), "extra")
         with open(self.vargs.configfile, "r") as f:
             raw = f.read()
         configlines = [[i.strip() for i in x] for x in re.findall(r'^([A-Za-z0-9_]+) = "(.*?)"$', raw, flags=re.MULTILINE)]
@@ -63,7 +63,7 @@ class mcsf(object):
         return _tmp
 
     def backup_config(self):
-        self.out("Making a backup from {} to {}...".format(
+        self.out("Making a backup from {0} to {1}...".format(
             self.vargs.configfile, self.vargs.configfile + ".backup"), "extra")
         try:
             copyfile(self.vargs.configfile, self.vargs.configfile + ".backup")
@@ -71,11 +71,11 @@ class mcsf(object):
         except Exception as e:
             self.out(
                 "Unable to make a backup of the configuration file "
-                "({}). Ignoring. ({})".format(self.vargs.configfile, str(e)), "extra")
+                "({0}). Ignoring. ({1})".format(self.vargs.configfile, str(e)), "extra")
 
     def update_config(self, value, keys):
         try:
-            self.out("Attempting to write changes to {}...".format(
+            self.out("Attempting to write changes to {0}...".format(
                      self.vargs.configfile), "extra")
             with open(self.vargs.configfile, "r") as f:
                 tmp = f.read().split("\n")
@@ -87,7 +87,7 @@ class mcsf(object):
                     replaced = False
                     for key in keys:
                         if line.startswith(key + " "):
-                            new = re.sub(r'^%s = ".*?"$' % key, '{} = "{}"'.format(key, value), line)
+                            new = re.sub(r'^%s = ".*?"$' % key, '{0} = "{1}"'.format(key, value), line)
                             lines.append(new)
                             replaced = True
                             break
@@ -97,7 +97,7 @@ class mcsf(object):
                 f.write("\n".join(lines))
             self.out("Successfully saved configuration file.", "extra")
         except Exception as e:
-            self.out("Unable to write changes to {} ({}). Exiting.".format(
+            self.out("Unable to write changes to {0} ({1}). Exiting.".format(
                 self.vargs.configfile, str(e)), "error")
             sys.exit(1)
 
