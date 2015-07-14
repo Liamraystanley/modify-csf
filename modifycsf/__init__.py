@@ -7,7 +7,7 @@ import itertools
 import subprocess
 from shutil import copyfile
 
-version = "0.0.5"
+version = "0.0.6"
 csf_binary_location = "/usr/sbin/csf"
 
 parser = argparse.ArgumentParser(
