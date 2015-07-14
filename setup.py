@@ -15,4 +15,5 @@ setup(name="mcsf",
       license="MIT",
       packages=["modifycsf"],
       scripts=['mcsf'],
+      install_requires=['wheel'],
       **extra)
